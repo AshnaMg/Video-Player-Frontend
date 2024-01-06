@@ -39,9 +39,13 @@ const VideoCard = ({ displayVideo, setDeleteVideoStatus }) => {
     await addToHistory(videoDetails)
   };
 
+  const dragStarted=(e,id)=>{
+e.dataTransfer.setData("VideoId",id);
+  }
+
   return (
     <>
-      <Card style={{ width: "18rem" }} onClick={handleShow}>
+      <Card style={{ width: "18rem" }} onClick={handleShow} draggable onDragStart={(e)=>dragStarted(e,displayVideo?.id)}>
         <Card.Img
           className="p-2"
           variant="top"

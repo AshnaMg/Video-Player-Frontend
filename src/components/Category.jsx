@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
-import { addCategory, getAllCategory,deleteCategory } from "../services/allAPI";
+import {
+  addCategory,
+  getAllCategory,
+  deleteCategory,
+  getVideoById,
+  updateCategory,
+} from "../services/allAPI";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -55,8 +61,24 @@ const Category = ({ setaddCategoryStatus }) => {
   useEffect(() => {
     getAllCat();
     setDeleteCatStatus(false);
-  }, [categoryName,deleteCatStatus]);
-  
+  }, [categoryName, deleteCatStatus]);
+
+  const dragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const videoDrop = async (e, categoryId) => {
+    const videoId = e.dataTransfer.getData("videoId");
+    const result = await getVideoById(videoId);
+    const { data } = result;
+    let selectedCategory = allCategory.find((i) => i.id == categoryId);
+    console.log(data)
+    console.log(allCategory);
+    console.log(selectedCategory);
+    selectedCategory.allVideos.push(data);
+    console.log(selectedCategory);
+    await updateCategory(categoryId,selectedCategory)
+  };
 
   return (
     <>
@@ -68,10 +90,16 @@ const Category = ({ setaddCategoryStatus }) => {
       <div className="ms-1">
         {allCategory && allCategory.length > 0 ? (
           allCategory.map((item) => (
-            <div className="m-5 border border-secondary rounded p-3" >
+            <div
+              className="m-5 border border-secondary rounded p-3"
+              droppable
+              onDragOver={(e) => dragOver(e)}
+              onDrop={(e) => videoDrop(e, item.id)}
+            >
               <div className="d-flex justify-content-between align-items-center">
                 <h6>{item.categoryName}</h6>
-                <button className="btn btn-danger"
+                <button
+                  className="btn btn-danger ms-3"
                   onClick={() => handleDeleteCategory(item.id)}
                 >
                   <i className="fa-solid fa-xmark"></i>
